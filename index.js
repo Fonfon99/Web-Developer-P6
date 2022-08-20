@@ -8,15 +8,19 @@ const port = 3000
 require("./mongo")
 
 // controllers
-const {createUser, logUser} = require("./controllers/users")
+const {signUser, logUser} = require("./controllers/users")
+const { getSauces, createSauce } = require("./controllers/sauces")
 
 // middleware
 app.use(cors())
 app.use(express.json())
+const {authentification} = require("./middleware/auth")
 
 // routes
-app.post("/api/auth/signup", createUser) 
+app.post("/api/auth/signup", signUser) 
 app.post("/api/auth/login", logUser)
+app.get("/api/sauces", authentification, getSauces)
+app.post("/api/sauces", authentification, createSauce) 
 app.get("/", (req , res) => res.send("Hello world"))
 
 // listen

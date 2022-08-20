@@ -1,7 +1,8 @@
 const { User } = require("../mongo");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
-async function createUser(req, res) {
+async function signUser(req, res) {
   const { email, password } = req.body;
 
   const hashedPassword = await hashPassword(password);
@@ -11,7 +12,9 @@ async function createUser(req, res) {
   user
     .save()
     .then(() => res.send({ message: "utilisateur enregistre" }))
-    .catch((err) => res.status(409).send({message: "utilisateur pas enregistre " + err }));
+    .catch((err) =>
+      res.status(409).send({ message: "utilisateur pas enregistre " + err })
+    );
 }
 
 function hashPassword(password) {
@@ -20,18 +23,26 @@ function hashPassword(password) {
 }
 
 async function logUser(req, res) {
-  const email = req.body.email
-  const password = req.body.password   
-  const user = await User.findOne({email: email})
-  const isPasswordOk = await bcrypt.compare(password, user.password)
-  if(!isPasswordOk){
-    res.status(403).send({message: "mot de passe incorrect"})
+  try {
+  const email = req.body.email;
+  const password = req.body.password;
+  const user = await User.findOne({ email: email });
+
+  const isPasswordOk = await bcrypt.compare(password, user.password);
+  if (!isPasswordOk) {
+    res.status(403).send({ message: "mot de passe incorrect" });
   }
-  res.status(200).send({message: "connexion reussi"})
-  
-  console.log('user:', user)
-  console.log('isPasswordOk:', isPasswordOk)
+  const token = createToken(email);
+  res.status(200).send({ userId: user?._id, token: token });
+} catch (err) {
+  res.status(500).send({message: "Erreur interne" })
+ }
 }
 
+function createToken(email) {
+  
+  const jwtPassword = process.env.JWT_PASSWORD;
+  return jwt.sign({ email: email }, jwtPassword, { expiresIn: "24h" });
+}
 
-module.exports = { createUser, logUser };
+module.exports = { signUser, logUser };
