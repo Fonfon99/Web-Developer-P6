@@ -25,8 +25,8 @@ const sauceSchema = new mongoose.Schema({
   mainPepper: String, 
   imageUrl: String, 
   heat: Number,
-  likes: Number,
-  dislikes: Number ,
+  likes: {Number, default: 0},
+  dislikes: {Number, default: 0} ,
   usersLiked: [ String ],
   usersDisliked : [ String ]
 })

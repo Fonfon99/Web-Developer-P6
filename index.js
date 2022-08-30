@@ -1,28 +1,20 @@
-require("dotenv").config()
-const express = require("express")
-const app = express()
-const cors = require("cors")
+const {app, express} = require("./server")
 const port = 3000
+const path = require('path')
+const {saucesRouter} = require("./routers/sauces.routes")
+const {authRouter} = require("./routers/auth.routes")
 
 // connection
 require("./mongo")
 
-// controllers
-const {signUser, logUser} = require("./controllers/users")
-const { getSauces, createSauce } = require("./controllers/sauces")
-
-// middleware
-app.use(cors())
-app.use(express.json())
-const {authentification} = require("./middleware/auth")
+//Middleware
+app.use("/api/sauces", saucesRouter)
+app.use("/api/auth", authRouter)
 
 // routes
-app.post("/api/auth/signup", signUser) 
-app.post("/api/auth/login", logUser)
-app.get("/api/sauces", authentification, getSauces)
-app.post("/api/sauces", authentification, createSauce) 
 app.get("/", (req , res) => res.send("Hello world"))
 
 // listen
+app.use('/images', express.static(path.join(__dirname, 'images')))
 app.listen(port, () => console.log("listening on port " + port))
 

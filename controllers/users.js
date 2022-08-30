@@ -2,6 +2,7 @@ const { User } = require("../mongo");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+
 async function signUser(req, res) {
   const { email, password } = req.body;
 
@@ -33,7 +34,7 @@ async function logUser(req, res) {
     res.status(403).send({ message: "mot de passe incorrect" });
   }
   const token = createToken(email);
-  res.status(200).send({ userId: user?._id, token: token });
+  res.status(200).json({ userId: user?._id, token: token });
 } catch (err) {
   res.status(500).send({message: "Erreur interne" })
  }
@@ -46,3 +47,4 @@ function createToken(email) {
 }
 
 module.exports = { signUser, logUser };
+
