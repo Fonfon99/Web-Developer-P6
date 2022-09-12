@@ -1,6 +1,7 @@
-require("dotenv").config()
+// import du package express
 const express = require("express")
 const app = express()
+// import du package cors 
 const cors = require("cors")
 
 // middleware
